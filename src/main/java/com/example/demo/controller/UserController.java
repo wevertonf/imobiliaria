@@ -1,17 +1,25 @@
 package com.example.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties.Http;
 import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.http.ResponseEntity;
 
+import com.example.demo.dto.UserDTO;
 import com.example.demo.model.UserModel;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.services.UserServices;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.net.URI;
 import java.util.ArrayList;
+
 
 
 
@@ -46,7 +54,7 @@ public class UserController {
         return lista;
 
     } */
-   
+/* 
     @Autowired
     UserRepository repositorio;
 
@@ -114,10 +122,67 @@ public class UserController {
             // Retorna 404 Not Found se o ID não existir
             return ResponseEntity.notFound().build();
         }
-    }
-    
-}
+    }*/
 
+    @Autowired
+    private UserServices service;
+
+    @GetMapping
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        List<UserModel> usuarios = service.getAll();
+        //return ResponseEntity.status(200).body(usuarios);
+        List<UserDTO> usuariosDTO = usuarios.stream()
+            .map(user -> new UserDTO(user))
+            .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(usuariosDTO);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable int id) {
+        UserModel user = service.find(id);
+        if (user != null) {
+            UserDTO userDTO = new UserDTO(user);
+            return ResponseEntity.status(HttpStatus.OK).body(userDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserModel> update(@PathVariable int id, @RequestBody UserModel model) {
+        model.setId(id); // Garantir que o ID do path seja usado
+        model = service.update(model);
+        return ResponseEntity.noContent().build();
+    }
+
+    /* @PostMapping
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO dto) {
+        UserModel savedUser = service.insert(dto);
+        //converter para DTO
+        UserDTO savedUserDTO = new UserDTO(savedUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUserDTO);
+        //trocar o retorno p/ uri(PENDENTE)
+    } */
+
+    @PostMapping
+    public ResponseEntity<Void> createUser(@RequestBody UserDTO dto) {
+        UserModel model = service.insert(dto);
+        // return new ResponseEntity(model, HttpStatus.CREATED);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(model.getId()).toUri();
+        return ResponseEntity.created(uri).build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable int id) {
+        boolean deleted = service.delete(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+}
 
 
 /* 
@@ -127,3 +192,4 @@ Validação: Use @Valid e anotações do Bean Validation (como @NotNull, @Email)
 Tratamento Global de Erros: Use @ControllerAdvice para tratar exceções globais de forma padronizada.
 Segurança: Para um projeto real, adicione Spring Security para proteger os endpoints. 
 */
+
