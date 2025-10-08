@@ -11,6 +11,8 @@ import com.example.demo.repository.BairrosRepository;
 import com.example.demo.repository.UserRepository; // Você já tem isso
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +34,11 @@ public class ImoveisServices {
 
     public List<ImoveisModel> getAll() {
         return repositorio.findAll();
+    }
+
+    public Page<ImoveisModel> getAll(Pageable pageable) {
+        Page<ImoveisModel> list = repositorio.findAll(pageable);
+        return list;
     }
 
     public ImoveisModel find(Integer id) {
@@ -97,8 +104,8 @@ public class ImoveisServices {
         }
 
         return repositorio.save(model);
-    }
-
+    } 
+ 
     public ImoveisModel update(ImoveisModel model) {
         try {
             if (find(model.getId()) != null) {

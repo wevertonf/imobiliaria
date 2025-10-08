@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.UserDTO;
+import com.example.demo.model.ImoveisModel;
 import com.example.demo.model.UserModel;
 import com.example.demo.repository.UserRepository;
 
@@ -22,6 +25,11 @@ public class UserServices {
     public List<UserModel> getAll() {
         List<UserModel> lista = repositorio.findAll();
         return lista;
+    }
+
+    public Page<UserModel> getAll(Pageable pageable) {
+        Page<UserModel> list = repositorio.findAll(pageable);
+        return list;
     }
 
     public UserModel find(Integer id) {

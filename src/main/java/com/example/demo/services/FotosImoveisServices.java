@@ -7,6 +7,8 @@ import com.example.demo.repository.FotosImoveisRepository;
 import com.example.demo.repository.ImoveisRepository; // Para buscar imóvel
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +24,11 @@ public class FotosImoveisServices {
 
     public List<FotosImoveisModel> getAll() {
         return repositorio.findAll();
+    }
+
+    public Page<FotosImoveisModel> getAll(Pageable pageable) {
+        Page<FotosImoveisModel> list = repositorio.findAll(pageable);
+        return list;
     }
 
     public FotosImoveisModel find(Integer id) {

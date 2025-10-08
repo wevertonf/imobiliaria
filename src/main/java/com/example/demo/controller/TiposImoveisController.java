@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.net.URI;
 import java.util.List;
@@ -26,6 +28,11 @@ public class TiposImoveisController {
         return ResponseEntity.status(HttpStatus.OK).body(lista);
     }
 
+    @GetMapping("/tipos-page")
+    public Page<TiposImoveisModel> getPosts(Pageable pageable) {
+        return service.getAll(pageable);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<TiposImoveisModel> getById(@PathVariable Integer id) {
         TiposImoveisModel model = service.find(id);
@@ -36,13 +43,22 @@ public class TiposImoveisController {
         }
     }
 
-    @PostMapping
+    /* @PostMapping
     public ResponseEntity<Void> create(@RequestBody TiposImoveisDTO dto) {
         TiposImoveisModel model = service.insert(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(model.getId()).toUri();
         return ResponseEntity.created(uri).build();
-    }
+    } */
+
+    @PostMapping
+    public ResponseEntity<Void> create(@RequestBody TiposImoveisModel model) {
+        model = service.insert(model);
+        // return new ResponseEntity(model, HttpStatus.CREATED);
+        URI uri =
+        ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(model.getId()).toUri();
+        return ResponseEntity.created(uri).build();
+}
 
     @PutMapping("/{id}")
     public ResponseEntity<TiposImoveisModel> update(@PathVariable Integer id, @RequestBody TiposImoveisModel model) {

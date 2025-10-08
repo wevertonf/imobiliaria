@@ -11,6 +11,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "imoveis")
 @Getter
@@ -26,6 +29,7 @@ public class ImoveisModel implements Serializable {
     @NotBlank(message = "Título é obrigatório")
     private String titulo;
 
+    @Column(columnDefinition = "TEXT")
     private String descricao;
 
     @DecimalMin(value = "0.0", inclusive = true, message = "Preço de venda deve ser zero ou positivo")
@@ -68,26 +72,31 @@ public class ImoveisModel implements Serializable {
     @NotBlank(message = "CEP é obrigatório")
     private String cep;
 
+    @Column(columnDefinition = "text")
     private String caracteristicas;
 
     private Boolean destaque = false;
 
     // Relacionamento com Tipos de Imóveis (muitos imóveis para um tipo)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tipo_imovel_id", nullable = false) // fk
+    @JoinColumn(name = "tipo_imovel_id") // fk
     private TiposImoveisModel tipoImovel;
 
     // Relacionamento com Bairros (muitos imóveis para um bairro)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bairro_id", nullable = false) // fk
+    @JoinColumn(name = "bairro_id") // fk
     private BairrosModel bairro;
 
     // Relacionamento com Usuários (muitos imóveis para um usuário)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id", nullable = false) // fk
+    @JoinColumn(name = "usuario_id") // fk
     private UserModel usuario;
 
     // Relacionamento com Fotos (um imóvel pode ter muitas fotos)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "imovel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<FotosImoveisModel> fotos;
 

@@ -9,6 +9,8 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "tipos_imoveis")
 @Getter
@@ -24,10 +26,12 @@ public class TiposImoveisModel implements Serializable {
     @NotBlank(message = "Nome é obrigatório")
     private String nome;
 
+    @Column(columnDefinition = "TEXT")
     private String descricao;
 
     // Relacionamento com Imóveis (um tipo pode ter muitos imóveis)
     @OneToMany(mappedBy = "tipoImovel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<ImoveisModel> imoveis;
 
     public TiposImoveisModel() {}

@@ -2,12 +2,15 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.FotosImoveisDTO;
 import com.example.demo.model.FotosImoveisModel;
+import com.example.demo.model.ImoveisModel;
 import com.example.demo.services.FotosImoveisServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.net.URI;
 import java.util.List;
@@ -25,6 +28,11 @@ public class FotosImoveisController {
         return ResponseEntity.status(HttpStatus.OK).body(lista);
     }
 
+    @GetMapping("/fotos-page")
+    public Page<FotosImoveisModel> getPosts(Pageable pageable) {
+        return service.getAll(pageable);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<FotosImoveisModel> getById(@PathVariable Integer id) {
         FotosImoveisModel model = service.find(id);
@@ -40,6 +48,15 @@ public class FotosImoveisController {
         FotosImoveisModel model = service.insert(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(model.getId()).toUri();
+        return ResponseEntity.created(uri).build();
+    } 
+
+    @PostMapping
+    public ResponseEntity<Void> create(@RequestBody FotosImoveisModel model) {
+        model = service.insert(model);
+        // return new ResponseEntity(model, HttpStatus.CREATED);
+        URI uri =
+        ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(model.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
 

@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.http.ResponseEntity;
 
 import com.example.demo.dto.UserDTO;
+import com.example.demo.model.ImoveisModel;
 import com.example.demo.model.UserModel;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.services.UserServices;
@@ -19,6 +20,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.net.URI;
 import java.util.ArrayList;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 
@@ -35,7 +39,82 @@ DELETE /users/1 */
 
 public class UserController {
 
-    /* @GetMapping("/users")
+    @Autowired
+    private UserServices service;
+
+    @GetMapping
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        List<UserModel> usuarios = service.getAll();
+        //return ResponseEntity.status(200).body(usuarios);
+        List<UserDTO> usuariosDTO = usuarios.stream()
+            .map(user -> new UserDTO(user))
+            .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(usuariosDTO);
+    }
+
+    @GetMapping("/users-page")
+    public Page<UserDTO> getPosts(Pageable pageable) {
+        return service.getAll(pageable).map(UserDTO::new);
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable int id) {
+        UserModel user = service.find(id);
+        if (user != null) {
+            UserDTO userDTO = new UserDTO(user);
+            return ResponseEntity.status(HttpStatus.OK).body(userDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserModel> update(@PathVariable int id, @RequestBody UserModel model) {
+        model.setId(id); // Garantir que o ID do path seja usado
+        model = service.update(model);
+        return ResponseEntity.noContent().build();
+    }
+
+    /* @PostMapping
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO dto) {
+        UserModel savedUser = service.insert(dto);
+        //converter para DTO
+        UserDTO savedUserDTO = new UserDTO(savedUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUserDTO);
+        //trocar o retorno p/ uri(PENDENTE)
+    } */
+
+    @PostMapping
+    public ResponseEntity<Void> createUser(@RequestBody UserDTO dto) {
+        UserModel model = service.insert(dto);
+        // return new ResponseEntity(model, HttpStatus.CREATED);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(model.getId()).toUri();
+        return ResponseEntity.created(uri).build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable int id) {
+        boolean deleted = service.delete(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+}
+
+
+/* 
+✅ Dicas Importantes
+Senha: Atualizar senhas diretamente via PUT pode ser inseguro. Considere um endpoint separado para alteração de senha.
+Validação: Use @Valid e anotações do Bean Validation (como @NotNull, @Email) nos campos do UserModel para validar automaticamente os dados recebidos.
+Tratamento Global de Erros: Use @ControllerAdvice para tratar exceções globais de forma padronizada.
+Segurança: Para um projeto real, adicione Spring Security para proteger os endpoints. 
+*/
+
+/* @GetMapping("/users")
     public String getAllUsers() {
         return "Lista de todos os usuários";
     } */
@@ -123,73 +202,4 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }*/
-
-    @Autowired
-    private UserServices service;
-
-    @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserModel> usuarios = service.getAll();
-        //return ResponseEntity.status(200).body(usuarios);
-        List<UserDTO> usuariosDTO = usuarios.stream()
-            .map(user -> new UserDTO(user))
-            .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(usuariosDTO);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable int id) {
-        UserModel user = service.find(id);
-        if (user != null) {
-            UserDTO userDTO = new UserDTO(user);
-            return ResponseEntity.status(HttpStatus.OK).body(userDTO);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<UserModel> update(@PathVariable int id, @RequestBody UserModel model) {
-        model.setId(id); // Garantir que o ID do path seja usado
-        model = service.update(model);
-        return ResponseEntity.noContent().build();
-    }
-
-    /* @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO dto) {
-        UserModel savedUser = service.insert(dto);
-        //converter para DTO
-        UserDTO savedUserDTO = new UserDTO(savedUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUserDTO);
-        //trocar o retorno p/ uri(PENDENTE)
-    } */
-
-    @PostMapping
-    public ResponseEntity<Void> createUser(@RequestBody UserDTO dto) {
-        UserModel model = service.insert(dto);
-        // return new ResponseEntity(model, HttpStatus.CREATED);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(model.getId()).toUri();
-        return ResponseEntity.created(uri).build();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
-        boolean deleted = service.delete(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-}
-
-
-/* 
-✅ Dicas Importantes
-Senha: Atualizar senhas diretamente via PUT pode ser inseguro. Considere um endpoint separado para alteração de senha.
-Validação: Use @Valid e anotações do Bean Validation (como @NotNull, @Email) nos campos do UserModel para validar automaticamente os dados recebidos.
-Tratamento Global de Erros: Use @ControllerAdvice para tratar exceções globais de forma padronizada.
-Segurança: Para um projeto real, adicione Spring Security para proteger os endpoints. 
-*/
 

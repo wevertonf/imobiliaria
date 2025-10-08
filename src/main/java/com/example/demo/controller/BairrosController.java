@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.BairrosDTO;
 import com.example.demo.model.BairrosModel;
+import com.example.demo.model.ImoveisModel;
 import com.example.demo.services.BairrosServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,12 +44,21 @@ public class BairrosController {
     }
 
     @PostMapping
+    public ResponseEntity<Void> create(@RequestBody BairrosModel model) {
+        model = service.insert(model);
+        // return new ResponseEntity(model, HttpStatus.CREATED);
+        URI uri =
+        ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(model.getId()).toUri();
+        return ResponseEntity.created(uri).build();
+        }
+
+    /* @PostMapping
     public ResponseEntity<Void> create(@RequestBody BairrosDTO dto) {
         BairrosModel model = service.insert(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(model.getId()).toUri();
         return ResponseEntity.created(uri).build();
-    }
+    } */
 
     @PutMapping("/{id}")
     public ResponseEntity<BairrosModel> update(@PathVariable Integer id, @RequestBody BairrosModel model) {
