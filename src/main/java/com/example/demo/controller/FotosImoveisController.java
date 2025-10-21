@@ -160,33 +160,6 @@ public class FotosImoveisController {
         return ResponseEntity.created(uri).build();
     }
 
-    /*
-     * @PostMapping
-     * public ResponseEntity<Void> create(@RequestBody FotosImoveisModel model) {
-     * model = service.insert(model);
-     * // return new ResponseEntity(model, HttpStatus.CREATED);
-     * URI uri =
-     * ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand
-     * (model.getId()).toUri();
-     * return ResponseEntity.created(uri).build();
-     * }
-     */
-
-    /*
-     * @PutMapping("/{id}")
-     * public ResponseEntity<FotosImoveisModel> update(@PathVariable Integer
-     * id, @RequestBody FotosImoveisModel model) {
-     * model.setId(id);
-     * model = service.update(model);
-     * if (model != null) {
-     * return ResponseEntity.status(HttpStatus.OK).body(model);
-     * } else {
-     * return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-     * }
-     * }
-     */
-
-    // ... dentro de FotosImoveisController.java ...
 
     @PutMapping("/{id}") // Mapeia PUT para /fotos-imoveis/{id}
     public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody FotosImoveisDTO dto) {
@@ -233,3 +206,4 @@ public class FotosImoveisController {
         }
     }
 }
+//PENDENTE: endpoint funcional para upload de fotos de imóveis!
