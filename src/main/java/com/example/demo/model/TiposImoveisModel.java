@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "tipos_imoveis")
@@ -31,6 +32,7 @@ public class TiposImoveisModel implements Serializable {
 
     // Relacionamento com Imóveis (um tipo pode ter muitos imóveis)
     @OneToMany(mappedBy = "tipoImovel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    //@JsonManagedReference
     @JsonIgnore
     private List<ImoveisModel> imoveis;
 

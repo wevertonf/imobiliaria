@@ -8,6 +8,9 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "fotos_imovel")
 @Getter
@@ -33,7 +36,9 @@ public class FotosImoveisModel implements Serializable {
 
     // Relacionamento com Imóveis (muitas fotos para um imóvel)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "imovel_id", nullable = false) // fk
+    @JoinColumn(name = "imovel_id", nullable = false)
+    @JsonBackReference
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private ImoveisModel imovel;
 
     public FotosImoveisModel() {}

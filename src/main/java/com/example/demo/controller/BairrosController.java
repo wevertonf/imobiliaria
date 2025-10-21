@@ -16,7 +16,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/bairros")
+@RequestMapping("/bairros")
 public class BairrosController {
 
     @Autowired
@@ -43,27 +43,38 @@ public class BairrosController {
         }
     }
 
-    @PostMapping
+    /* @PostMapping
     public ResponseEntity<Void> create(@RequestBody BairrosModel model) {
         model = service.insert(model);
         // return new ResponseEntity(model, HttpStatus.CREATED);
-        URI uri =
-        ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(model.getId()).toUri();
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(model.getId()).toUri();
         return ResponseEntity.created(uri).build();
-        }
+    } */
 
-    /* @PostMapping
+    @PostMapping
     public ResponseEntity<Void> create(@RequestBody BairrosDTO dto) {
         BairrosModel model = service.insert(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(model.getId()).toUri();
         return ResponseEntity.created(uri).build();
-    } */
+    }
 
-    @PutMapping("/{id}")
+    /* @PutMapping("/{id}")
     public ResponseEntity<BairrosModel> update(@PathVariable Integer id, @RequestBody BairrosModel model) {
         model.setId(id);
         model = service.update(model);
+        if (model != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(model);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    } */
+
+    // --- MÉTODO UPDATE ATUALIZADO PARA USAR DTO ---
+    @PutMapping("/{id}")
+    public ResponseEntity<BairrosModel> update(@PathVariable Integer id, @RequestBody BairrosDTO dto) {
+        // O service deve ter um método para atualizar usando DTO
+        BairrosModel model = service.update(id, dto);
         if (model != null) {
             return ResponseEntity.status(HttpStatus.OK).body(model);
         } else {

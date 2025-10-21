@@ -43,15 +43,21 @@ public class ImoveisController {
         }
     }
 
-    /* @PostMapping
-    public ResponseEntity<Void> create(@RequestBody ImoveisDTO dto) {
-        ImoveisModel model = service.insert(dto);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(model.getId()).toUri();
-        return ResponseEntity.created(uri).build();
-    } */
-
+    // --- MÉTODO CREATE ATUALIZADO PARA USAR DTO ---
     @PostMapping
+    public ResponseEntity<Void> create(@RequestBody ImoveisDTO dto) {
+        try {
+            ImoveisModel model = service.insert(dto);
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}").buildAndExpand(model.getId()).toUri();
+            return ResponseEntity.created(uri).build();
+        } catch (RuntimeException e) {
+            // Trata erros específicos, como "Bairro não encontrado"
+            return ResponseEntity.badRequest().build(); // Ou outro código apropriado
+        }
+    }
+
+    /* @PostMapping
     public ResponseEntity<Void> create(@RequestBody ImoveisModel model) {
         model = service.insert(model);
         // return new ResponseEntity(model, HttpStatus.CREATED);
@@ -59,8 +65,23 @@ public class ImoveisController {
         ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(model.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
-
+ */
     @PutMapping("/{id}")
+    public ResponseEntity<ImoveisModel> update(@PathVariable Integer id, @RequestBody ImoveisDTO dto) {
+        try {
+            ImoveisModel model = service.update(id, dto);
+            if (model != null) {
+                return ResponseEntity.status(HttpStatus.OK).body(model);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (RuntimeException e) {
+             // Trata erros específicos, como "Bairro não encontrado"
+            return ResponseEntity.badRequest().build(); // Ou outro código apropriado
+        }
+    }
+ 
+    /* @PutMapping("/{id}")
     public ResponseEntity<ImoveisModel> update(@PathVariable Integer id, @RequestBody ImoveisModel model) {
         model.setId(id);
         model = service.update(model);
@@ -69,7 +90,7 @@ public class ImoveisController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-    }
+    } */
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {

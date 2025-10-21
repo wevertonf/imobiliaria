@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -37,8 +38,9 @@ public class BairrosModel implements Serializable {
     private String cep_final;
 
     // Relacionamento com Imóveis (um bairro pode ter muitos imóveis)
-    @OneToMany(mappedBy = "bairro", orphanRemoval = false, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "bairro", orphanRemoval = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    //@JsonManagedReference("bairro-imovel") 
+    @JsonIgnore
     private List<ImoveisModel> imoveis = new ArrayList<>();
 
     public BairrosModel() {}

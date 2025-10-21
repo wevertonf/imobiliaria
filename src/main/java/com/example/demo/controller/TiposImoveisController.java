@@ -44,26 +44,37 @@ public class TiposImoveisController {
     }
 
     /* @PostMapping
-    public ResponseEntity<Void> create(@RequestBody TiposImoveisDTO dto) {
-        TiposImoveisModel model = service.insert(dto);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(model.getId()).toUri();
-        return ResponseEntity.created(uri).build();
-    } */
-
-    @PostMapping
     public ResponseEntity<Void> create(@RequestBody TiposImoveisModel model) {
         model = service.insert(model);
         // return new ResponseEntity(model, HttpStatus.CREATED);
         URI uri =
         ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(model.getId()).toUri();
         return ResponseEntity.created(uri).build();
-}
+    } */
 
-    @PutMapping("/{id}")
+    @PostMapping
+    public ResponseEntity<Void> create(@RequestBody TiposImoveisDTO dto) {
+        TiposImoveisModel model = service.insert(dto);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(model.getId()).toUri();
+        return ResponseEntity.created(uri).build();
+    }
+
+    /* @PutMapping("/{id}")
     public ResponseEntity<TiposImoveisModel> update(@PathVariable Integer id, @RequestBody TiposImoveisModel model) {
         model.setId(id);
         model = service.update(model);
+        if (model != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(model);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }  */
+
+    // --- MÉTODO UPDATE ATUALIZADO PARA USAR DTO ---
+    @PutMapping("/{id}")
+    public ResponseEntity<TiposImoveisModel> update(@PathVariable Integer id, @RequestBody TiposImoveisDTO dto) {
+        TiposImoveisModel model = service.update(id, dto);
         if (model != null) {
             return ResponseEntity.status(HttpStatus.OK).body(model);
         } else {

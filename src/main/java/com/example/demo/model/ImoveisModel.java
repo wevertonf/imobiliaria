@@ -11,8 +11,10 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "imoveis")
@@ -78,26 +80,32 @@ public class ImoveisModel implements Serializable {
     private Boolean destaque = false;
 
     // Relacionamento com Tipos de Imóveis (muitos imóveis para um tipo)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tipo_imovel_id") // fk
+    @JoinColumn(name = "tipo_imovel_id")
+    @JsonBackReference("tipo-imovel") //
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private TiposImoveisModel tipoImovel;
 
     // Relacionamento com Bairros (muitos imóveis para um bairro)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bairro_id") // fk
+    @JoinColumn(name = "bairro_id")
+    @JsonBackReference("bairro-imovel") // <--- Adicione aqui (value opcional para diferenciar)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Mantém
     private BairrosModel bairro;
 
     // Relacionamento com Usuários (muitos imóveis para um usuário)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id") // fk
+    @JoinColumn(name = "usuario_id")
+    @JsonBackReference("usuario-imovel") //
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private UserModel usuario;
 
     // Relacionamento com Fotos (um imóvel pode ter muitas fotos)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    // Se FotosImoveisModel tiver @JsonBackReference em "imovel", então este precisa de @JsonManagedReference
     @OneToMany(mappedBy = "imovel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    //@JsonManagedReference // <--- Adicione se FotosImoveisModel.imovel tem @JsonBackReference
+    //@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
+    @JsonIgnore // <-- Mais simples: ignora a lista de fotos na serialização
     private List<FotosImoveisModel> fotos;
 
     public ImoveisModel() {}

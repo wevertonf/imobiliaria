@@ -55,6 +55,21 @@ public class TiposImoveisServices {
         }
     }
 
+    // --- MÉTODO UPDATE USANDO DTO (NOVO) ---
+    public TiposImoveisModel update(Integer id, TiposImoveisDTO dto) {
+        java.util.Optional<TiposImoveisModel> optionalModel = repositorio.findById(id);
+        if (optionalModel.isPresent()) {
+            TiposImoveisModel model = optionalModel.get();
+            // Atualiza os campos com os dados do DTO
+            model.setNome(dto.getNome());
+            model.setDescricao(dto.getDescricao());
+            // Salva as alterações
+            return repositorio.save(model);
+        } else {
+            return null; // Ou lançar exceção
+        }
+    }
+
     public boolean delete(Integer id) {
         try {
             if (find(id) != null) {

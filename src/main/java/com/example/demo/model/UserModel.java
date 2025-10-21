@@ -2,11 +2,17 @@ package com.example.demo.model;
 
 import java.io.Serializable;
 //import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,6 +27,10 @@ public class UserModel implements Serializable {
     private String email;
     private String senha;
     private String tipo;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ImoveisModel> imoveis;
 
     public UserModel() {
     }

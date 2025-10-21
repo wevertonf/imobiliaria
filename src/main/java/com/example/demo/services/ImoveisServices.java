@@ -66,7 +66,7 @@ public class ImoveisServices {
         return repositorio.save(model);
     }
 
-    public ImoveisModel insert(ImoveisDTO dto) {
+    /* public ImoveisModel insert(ImoveisDTO dto) {
         ImoveisModel model = new ImoveisModel();
         model.setTitulo(dto.getTitulo());
         model.setDescricao(dto.getDescricao());
@@ -104,7 +104,7 @@ public class ImoveisServices {
         }
 
         return repositorio.save(model);
-    } 
+    } */ 
  
     public ImoveisModel update(ImoveisModel model) {
         try {
@@ -133,6 +133,90 @@ public class ImoveisServices {
             return null;
         }
     }
+
+    // --- MÉTODO INSERT USANDO DTO (NOVO) ---
+    public ImoveisModel insert(ImoveisDTO dto) {
+        ImoveisModel model = new ImoveisModel();
+
+        // Copia os dados básicos do DTO para o Model
+        copyDtoToModel(dto, model);
+
+        // Salva o model no banco
+        return repositorio.save(model);
+    }
+
+    // --- MÉTODO UPDATE USANDO DTO (NOVO) ---
+    public ImoveisModel update(Integer id, ImoveisDTO dto) {
+        Optional<ImoveisModel> optionalModel = repositorio.findById(id);
+        if (optionalModel.isPresent()) {
+            ImoveisModel model = optionalModel.get();
+
+            // Copia os dados do DTO para o Model existente
+            copyDtoToModel(dto, model);
+
+            // Salva as alterações
+            return repositorio.save(model);
+        } else {
+            return null; // Ou lançar exceção
+        }
+    }
+
+    // --- MÉTODO AUXILIAR PARA COPIAR DADOS DO DTO PARA O MODEL ---
+    private void copyDtoToModel(ImoveisDTO dto, ImoveisModel model) {
+        model.setTitulo(dto.getTitulo());
+        model.setDescricao(dto.getDescricao());
+        model.setPreco_venda(dto.getPreco_venda());
+        model.setPreco_aluguel(dto.getPreco_aluguel());
+        model.setFinalidade(dto.getFinalidade());
+        model.setStatus(dto.getStatus());
+        model.setDormitorios(dto.getDormitorios());
+        model.setBanheiros(dto.getBanheiros());
+        model.setGaragem(dto.getGaragem());
+        model.setArea_total(dto.getArea_total());
+        model.setArea_construida(dto.getArea_construida());
+        model.setEndereco(dto.getEndereco());
+        model.setNumero(dto.getNumero());
+        model.setComplemento(dto.getComplemento());
+        model.setCep(dto.getCep());
+        model.setCaracteristicas(dto.getCaracteristicas());
+        model.setDestaque(dto.getDestaque());
+
+        // --- Tratamento dos Relacionamentos ---
+        // Busca e associa o Tipo de Imóvel
+        if (dto.getTipoImovelId() != null) {
+            TiposImoveisModel tipo = tiposImoveisRepository.findById(dto.getTipoImovelId()).orElse(null);
+            if (tipo == null) {
+                throw new RuntimeException("Tipo de Imóvel com ID " + dto.getTipoImovelId() + " não encontrado.");
+            }
+            model.setTipoImovel(tipo);
+        } else {
+             // Se for update e o ID for null, mantém o existente?
+             // Ou define como null? Depende da regra de negócio.
+             // Vamos assumir que, se for null, mantém o existente (no update).
+             // Se for create e for null, o banco pode reclamar se for NOT NULL.
+             // Para simplificar, vamos deixar passar e deixar o banco validar.
+        }
+
+        // Busca e associa o Bairro
+        if (dto.getBairroId() != null) {
+            BairrosModel bairro = bairrosRepository.findById(dto.getBairroId()).orElse(null);
+            if (bairro == null) {
+                throw new RuntimeException("Bairro com ID " + dto.getBairroId() + " não encontrado.");
+            }
+            model.setBairro(bairro);
+        }
+
+        // Busca e associa o Usuário
+        if (dto.getUsuarioId() != null) {
+            UserModel usuario = usuariosRepository.findById(dto.getUsuarioId()).orElse(null);
+            if (usuario == null) {
+                throw new RuntimeException("Usuário com ID " + dto.getUsuarioId() + " não encontrado.");
+            }
+            model.setUsuario(usuario);
+        }
+    }
+
+    
 
     public boolean delete(Integer id) {
         try {

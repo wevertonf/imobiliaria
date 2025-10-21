@@ -58,6 +58,24 @@ public class BairrosServices {
         }
     }
 
+    // --- MÉTODO UPDATE USANDO DTO ---
+    public BairrosModel update(Integer id, BairrosDTO dto) {
+        Optional<BairrosModel> optionalModel = repositorio.findById(id);
+        if (optionalModel.isPresent()) {
+            BairrosModel model = optionalModel.get();
+            // Atualiza os campos com os dados do DTO
+            model.setNome(dto.getNome());
+            model.setCidade(dto.getCidade());
+            model.setEstado(dto.getEstado());
+            model.setCep_inicial(dto.getCep_inicial());
+            model.setCep_final(dto.getCep_final());
+            // Salva as alterações
+            return repositorio.save(model);
+        } else {
+            return null; // Ou lançar exceção
+        }
+    }
+
     public boolean delete(Integer id) {
         try {
             if (find(id) != null) {
